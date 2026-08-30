@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-body text-neutral-900 bg-neutral-50;
+}
+
+h1, h2, h3, h4 {
+  @apply font-heading;
+}
+
+/* Hides the scrollbar on horizontally-scrolling strips (e.g. CategoryBar)
+   while keeping scroll functionality intact. */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
