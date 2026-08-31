@@ -4,6 +4,8 @@ import { getMyOrders, initiateDeliveryPayment, retryOrderPayment } from '../serv
 import OrderStatusStepper from '../components/cart/OrderStatusStepper';
 import Loader from '../components/common/Loader';
 import { getImageUrl } from '../utils/getImageUrl';
+import { markOrdersViewedNow } from '../utils/ordersLastViewed';
+import { notifyCountsChanged } from '../utils/notifyCountsChanged';
 
 function formatNaira(amount) {
   return new Intl.NumberFormat('en-NG', {
@@ -138,7 +140,14 @@ export default function OrderHistory() {
 
   useEffect(() => {
     getMyOrders()
-      .then((res) => setOrders(res.data))
+      .then((res) => {
+        setOrders(res.data);
+        // Opening Order History is what "seeing" the current statuses
+        // means here — clear the badge immediately rather than waiting on
+        // Navbar's next poll tick.
+        markOrdersViewedNow();
+        notifyCountsChanged();
+      })
       .catch(() => setError('Could not load your orders.'))
       .finally(() => setLoading(false));
   }, []);

@@ -5,6 +5,9 @@ import { useCart } from "../../hooks/useCart";
 import { useWishlist } from "../../hooks/useWishlist";
 import { getMyOffers, getVendorOffers } from "../../services/offerService";
 import { getUnreadCount } from "../../services/chatService";
+import { getMyOrders } from "../../services/orderService";
+import { onCountsChanged } from "../../utils/notifyCountsChanged";
+import { getOrdersLastViewed } from "../../utils/ordersLastViewed";
 
 // Small badge that only renders once there's something to show.
 function CountBadge({ count }) {
@@ -26,6 +29,7 @@ export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");
   const [offersCount, setOffersCount] = useState(0);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+  const [ordersCount, setOrdersCount] = useState(0);
   const debounceRef = useRef(null);
 
   // Keep the input in sync if the URL's ?q= changes some other way
@@ -69,8 +73,12 @@ export default function Navbar() {
     };
 
     fetchOffersCount();
-    const interval = setInterval(fetchOffersCount, 30000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchOffersCount, 12000);
+    const unsubscribe = onCountsChanged(fetchOffersCount);
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
   }, [user]);
 
   // Same reasoning as offers above.
@@ -88,8 +96,44 @@ export default function Navbar() {
     };
 
     fetchUnread();
-    const interval = setInterval(fetchUnread, 30000); // matched to offers — 15s was excessive background load
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchUnread, 12000);
+    const unsubscribe = onCountsChanged(fetchUnread);
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
+  }, [user]);
+
+  // Orders: badges any order updated (e.g. shipped/delivered) since the
+  // buyer last opened Order History. Same poll + immediate-refetch pattern
+  // as offers/messages above; "last viewed" is tracked client-side since
+  // there's no per-user read-state for orders on the backend.
+  useEffect(() => {
+    if (!user || user.role !== "customer") {
+      setOrdersCount(0);
+      return;
+    }
+
+    const fetchOrdersCount = () => {
+      if (document.hidden) return;
+      const lastViewed = getOrdersLastViewed();
+      getMyOrders()
+        .then((res) => {
+          const count = res.data.filter(
+            (o) => new Date(o.updatedAt).getTime() > lastViewed,
+          ).length;
+          setOrdersCount(count);
+        })
+        .catch(() => {});
+    };
+
+    fetchOrdersCount();
+    const interval = setInterval(fetchOrdersCount, 12000);
+    const unsubscribe = onCountsChanged(fetchOrdersCount);
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
   }, [user]);
 
   const handleLogout = () => {
@@ -125,8 +169,13 @@ export default function Navbar() {
   // desktop icon row (icon-only until there's enough width for labels too).
   const navLinks = (isMobile) => {
     const labelClass = isMobile ? "" : "hidden xl:inline";
+    // Both branches need `relative` — CountBadge positions itself with
+    // `absolute`, and without a positioned ancestor here it escapes to the
+    // nearest one further up the tree (the sticky header), landing all
+    // badges in one spot instead of pinned to their own icon. This was the
+    // actual cause of badges appearing missing/wrong on mobile.
     const itemClass = isMobile
-      ? "flex items-center gap-2 py-2 hover:text-accent-200"
+      ? "relative flex items-center gap-2 py-2 hover:text-accent-200"
       : "relative flex items-center gap-1.5 hover:text-accent-200";
 
     if (!user) {
@@ -179,6 +228,7 @@ export default function Navbar() {
             >
               <i className="ti ti-package text-lg" />
               <span className={labelClass}>Orders</span>
+              <CountBadge count={ordersCount} />
             </Link>
             <Link
               to="/my-offers"

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "../../services/supabaseClient";
 import {
   getMessages,
@@ -9,9 +10,19 @@ import {
   markRead,
 } from "../../services/chatService";
 import { useAuth } from "../../hooks/useAuth";
+import { notifyCountsChanged } from "../../utils/notifyCountsChanged";
+import { getImageUrl } from "../../utils/getImageUrl";
 import Loader from "../common/Loader";
 
 const EDIT_DELETE_WINDOW_MS = 60 * 60 * 1000; // must match the backend's window
+
+function formatNaira(amount) {
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
 
 function ReceiptTicks({ message }) {
   if (message.read_at)
@@ -21,7 +32,7 @@ function ReceiptTicks({ message }) {
   return <i className="ti ti-check text-primary-300" title="Sent" />;
 }
 
-export default function ChatWindow({ conversationId, otherPartyName }) {
+export default function ChatWindow({ conversationId, otherPartyName, product }) {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +61,7 @@ export default function ChatWindow({ conversationId, otherPartyName }) {
       .then((res) => {
         setMessages(res.data);
         markRead(conversationId);
+        notifyCountsChanged();
       })
       .finally(() => {
         setLoading(false);
@@ -75,6 +87,7 @@ export default function ChatWindow({ conversationId, otherPartyName }) {
           if (String(incoming.sender_id) !== String(user._id)) {
             markDelivered(conversationId, [incoming.id]);
             markRead(conversationId);
+            notifyCountsChanged();
             if (
               document.hidden &&
               "Notification" in window &&
@@ -163,6 +176,7 @@ export default function ChatWindow({ conversationId, otherPartyName }) {
       } else {
         const res = await sendMessage(conversationId, trimmed, replyTarget?.id);
         setMessages((prev) => [...prev, res.data]);
+        notifyCountsChanged();
       }
       cancelComposeExtras();
     } catch (err) {
@@ -186,6 +200,33 @@ export default function ChatWindow({ conversationId, otherPartyName }) {
       <div className="bg-primary-900 text-white px-4 py-3 shrink-0">
         <p className="font-heading font-semibold text-sm">{otherPartyName}</p>
       </div>
+
+      {product && (
+        <Link
+          to={`/products/${product._id}`}
+          className="flex items-center gap-3 px-4 py-2.5 bg-neutral-50 border-b border-neutral-100 shrink-0 hover:bg-neutral-100 transition"
+        >
+          <div className="w-10 h-10 rounded-lg overflow-hidden bg-white border border-neutral-100 shrink-0 flex items-center justify-center">
+            {product.image ? (
+              <img
+                src={getImageUrl(product.image)}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-neutral-300 text-[8px]">No img</span>
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-neutral-900 truncate">
+              {product.name}
+            </p>
+            <p className="text-xs text-neutral-500">
+              {formatNaira(product.price)}
+            </p>
+          </div>
+        </Link>
+      )}
 
       <div
         ref={scrollContainerRef}

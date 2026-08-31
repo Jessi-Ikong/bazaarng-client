@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { getProductById } from "../services/productService";
 import { addItemToCart } from "../services/cartService";
 import { getWishlist } from "../services/wishlistService";
+import { getMyOffers } from "../services/offerService";
 import { getOrCreateConversation } from "../services/chatService";
 import {
   getProductReviews,
@@ -43,6 +44,7 @@ export default function ProductDetails() {
   const [selectedOptions, setSelectedOptions] = useState({});
   const [reviews, setReviews] = useState([]);
   const [eligibility, setEligibility] = useState(null); // { eligible, reason } | null
+  const [offerContext, setOfferContext] = useState(null); // the accepted offer redirected here from MyOffers, if any
 
   useDocumentMeta(
     product ? `${product.name} — KoboBuy` : "KoboBuy",
@@ -79,11 +81,34 @@ export default function ProductDetails() {
     setSelectedOptions({});
   }, [id, user]);
 
+  // MyOffers redirects here (with an offerId in nav state) when a product
+  // has variant options that need choosing before the accepted-offer price
+  // can be applied. Re-fetch the offer here rather than trusting the
+  // redirect's price — the backend re-validates status/expiry anyway when
+  // the item is actually added, so this is purely so the customer can see
+  // which price applies before they choose options and click "Add to cart."
+  useEffect(() => {
+    const offerId = location.state?.offerId;
+    if (!offerId || !user) {
+      setOfferContext(null);
+      return;
+    }
+
+    getMyOffers()
+      .then((res) => {
+        const offer = res.data.find(
+          (o) => o._id === offerId && String(o.product?._id) === id && o.status === "accepted",
+        );
+        setOfferContext(offer || null);
+      })
+      .catch(() => setOfferContext(null));
+  }, [location.state?.offerId, id, user]);
+
   const handleAddToCart = async () => {
     setCartMessage("");
     setAddingToCart(true);
     try {
-      await addItemToCart(product._id, 1, selectedOptions);
+      await addItemToCart(product._id, 1, selectedOptions, offerContext?._id);
       setCartMessage("Added to cart.");
       refreshCart();
     } catch (err) {
@@ -165,6 +190,12 @@ export default function ProductDetails() {
           {formatNaira(product.price)}
         </p>
 
+        {offerContext && (
+          <p className="text-sm font-medium text-primary-700 bg-primary-50 rounded-lg px-3 py-2 mb-4">
+            Adding at your accepted offer price: {formatNaira(offerContext.proposedPrice)}
+          </p>
+        )}
+
         <p className="text-sm text-neutral-700 leading-relaxed mb-6 whitespace-pre-line">
           {product.description}
         </p>
@@ -221,7 +252,11 @@ export default function ProductDetails() {
             disabled={!inStock || !user || addingToCart || !allOptionsSelected}
             className="h-10 px-6 rounded-lg bg-primary-900 text-white text-sm font-medium hover:bg-primary-800 disabled:opacity-50 transition"
           >
-            {addingToCart ? "Adding..." : "Add to cart"}
+            {addingToCart
+              ? "Adding..."
+              : offerContext
+                ? `Add to cart at ${formatNaira(offerContext.proposedPrice)}`
+                : "Add to cart"}
           </button>
 
           {product.offersEnabled && (

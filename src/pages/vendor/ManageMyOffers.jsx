@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getVendorOffers, respondToOffer } from '../../services/offerService';
 import Loader from '../../components/common/Loader';
+import { notifyCountsChanged } from '../../utils/notifyCountsChanged';
 
 function formatNaira(amount) {
   return new Intl.NumberFormat('en-NG', {
@@ -46,6 +47,7 @@ export default function ManageMyOffers() {
     try {
       const res = await respondToOffer(offerId, action, counterPrice);
       setOffers(offers.map((o) => (o._id === offerId ? res.data : o)));
+      notifyCountsChanged();
     } catch (err) {
       setError(err.response?.data?.message || 'Could not respond to offer.');
     } finally {

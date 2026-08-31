@@ -92,7 +92,11 @@ export default function Messages() {
 
       <div className="md:col-span-2">
         {active ? (
-          <ChatWindow conversationId={active.id} otherPartyName={active.otherPartyName} />
+          <ChatWindow
+            conversationId={active.id}
+            otherPartyName={active.otherPartyName}
+            product={active.product}
+          />
         ) : (
           <div className="h-[70vh] flex items-center justify-center text-sm text-neutral-400 bg-white border border-neutral-100 rounded-lg">
             Select a conversation to start chatting.
