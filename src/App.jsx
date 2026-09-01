@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
@@ -43,12 +44,13 @@ import ManageAllOrders from "./pages/admin/ManageAllOrders";
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <BrowserRouter>
-            <MainLayout>
-              <Routes>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <AuthProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <BrowserRouter>
+              <MainLayout>
+                <Routes>
                 {/* Public */}
                 <Route path="/" element={<Home />} />
                 <Route path="/products/:id" element={<ProductDetails />} />
@@ -237,6 +239,7 @@ function App() {
         </WishlistProvider>
       </CartProvider>
     </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 

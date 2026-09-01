@@ -22,11 +22,23 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
+  // Shared by every auth flow that ends in "here's a user + token" —
+  // normal login, both registration flows, and Google sign-in — so each
+  // just needs to get that response and hand it here.
+  const applyAuthResponse = (data) => {
+    localStorage.setItem('kobobuy_token', data.token);
+    setUser(data);
+    return data;
+  };
+
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
-    localStorage.setItem('kobobuy_token', res.data.token);
-    setUser(res.data);
-    return res.data;
+    return applyAuthResponse(res.data);
+  };
+
+  const loginWithGoogle = async (credential) => {
+    const res = await api.post('/auth/google', { credential });
+    return applyAuthResponse(res.data);
   };
 
   const registerCustomer = async (formData) => {
@@ -50,7 +62,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, registerCustomer, registerVendor, logout }}
+      value={{ user, loading, login, loginWithGoogle, registerCustomer, registerVendor, logout }}
     >
       {children}
     </AuthContext.Provider>

@@ -27,7 +27,28 @@ const EMPTY_FORM = {
   images: [], // array of uploaded image paths, not a comma string
   offersEnabled: true,
   options: [], // e.g. [{ name: 'Size', values: ['S','M','L'] }]
+  variantPrices: {}, // { comboKey: 'price string' } — sparse, blank means "use base price"
 };
+
+// Canonical string key for an option combination, e.g. { Size: 'L', Color: 'Red' }
+// -> "Color:Red|Size:L" — sorted so key order never affects matching.
+function comboKey(combination) {
+  return Object.keys(combination)
+    .sort()
+    .map((k) => `${k}:${combination[k]}`)
+    .join("|");
+}
+
+// Cartesian product of every option group's values, e.g.
+// [{name:'Size',values:['S','M']},{name:'Color',values:['Red']}] ->
+// [{Size:'S',Color:'Red'}, {Size:'M',Color:'Red'}]
+function getCombinations(groups) {
+  if (groups.length === 0) return [];
+  return groups.reduce(
+    (acc, group) => acc.flatMap((combo) => group.values.map((v) => ({ ...combo, [group.name]: v }))),
+    [{}],
+  );
+}
 
 export default function ManageMyProducts() {
   const [products, setProducts] = useState([]);
@@ -62,6 +83,11 @@ export default function ManageMyProducts() {
   };
 
   const openEditForm = (product) => {
+    const variantPrices = {};
+    (product.variantPrices || []).forEach((vp) => {
+      variantPrices[comboKey(vp.combination)] = String(vp.price);
+    });
+
     setEditingId(product._id);
     setForm({
       name: product.name,
@@ -75,6 +101,7 @@ export default function ManageMyProducts() {
         name: g.name,
         values: g.values.join(", "),
       })),
+      variantPrices,
     });
     setShowForm(true);
   };
@@ -168,6 +195,19 @@ export default function ManageMyProducts() {
       }))
       .filter((g) => g.name && g.values.length > 0);
 
+    // Only combinations that still exist under the final cleaned option
+    // groups get a variant price — one left blank (or belonging to a
+    // group/value the vendor since removed) just uses the base price.
+    const finalCombinations = getCombinations(cleanedOptions);
+    const cleanedVariantPrices = finalCombinations
+      .map((combination) => {
+        const priceStr = form.variantPrices[comboKey(combination)];
+        if (!priceStr) return null;
+        const price = Number(priceStr);
+        return price > 0 ? { combination, price } : null;
+      })
+      .filter(Boolean);
+
     const payload = {
       name: form.name,
       description: form.description,
@@ -177,6 +217,7 @@ export default function ManageMyProducts() {
       offersEnabled: form.offersEnabled,
       images: form.images,
       options: cleanedOptions,
+      variantPrices: cleanedVariantPrices,
     };
 
     try {
@@ -203,6 +244,18 @@ export default function ManageMyProducts() {
       setError(err.response?.data?.message || "Could not delete product.");
     }
   };
+
+  // Live-parsed from the comma-separated values as the vendor types, so the
+  // variant price rows below update immediately — not just after saving.
+  const liveOptionGroups = form.options
+    .map((g) => ({
+      name: g.name.trim(),
+      values: (typeof g.values === "string" ? g.values.split(",") : g.values)
+        .map((v) => v.trim())
+        .filter(Boolean),
+    }))
+    .filter((g) => g.name && g.values.length > 0);
+  const liveCombinations = getCombinations(liveOptionGroups);
 
   if (loading) return <Loader />;
 
@@ -405,6 +458,47 @@ export default function ManageMyProducts() {
                   </div>
                 ))}
               </div>
+
+              {liveCombinations.length > 0 && (
+                <div>
+                  <p className="text-xs text-neutral-600 mb-1.5">
+                    Variant prices{" "}
+                    <span className="text-neutral-400">
+                      (optional — blank uses the base price)
+                    </span>
+                  </p>
+                  <div className="space-y-1.5">
+                    {liveCombinations.map((combo) => {
+                      const key = comboKey(combo);
+                      return (
+                        <div key={key} className="flex items-center gap-2">
+                          <span className="text-xs text-neutral-600 flex-1 truncate">
+                            {Object.entries(combo)
+                              .map(([k, v]) => `${k}: ${v}`)
+                              .join(", ")}
+                          </span>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="Base price"
+                            value={form.variantPrices[key] || ""}
+                            onChange={(e) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                variantPrices: {
+                                  ...prev.variantPrices,
+                                  [key]: e.target.value,
+                                },
+                              }))
+                            }
+                            className="w-28 h-8 rounded-lg border border-neutral-100 px-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary-400"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <label className="flex items-center gap-2 text-sm text-neutral-700">
                 <input

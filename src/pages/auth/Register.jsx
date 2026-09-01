@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../../hooks/useAuth";
 import AuthCard from "../../components/common/AuthCard";
 
@@ -11,7 +12,7 @@ const FIELDS = [
 ];
 
 export default function Register() {
-  const { registerCustomer } = useAuth();
+  const { registerCustomer, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -38,6 +39,16 @@ export default function Register() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError("");
+    try {
+      await loginWithGoogle(credentialResponse.credential);
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.message || "Google sign-in failed. Please try again.");
     }
   };
 
@@ -79,6 +90,19 @@ export default function Register() {
           </button>
         </div>
       </form>
+
+      <div className="flex items-center gap-2 mt-4">
+        <div className="flex-1 h-px bg-neutral-100" />
+        <span className="text-[10px] text-neutral-400 uppercase">or</span>
+        <div className="flex-1 h-px bg-neutral-100" />
+      </div>
+
+      <div className="flex justify-center mt-4">
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={() => setError("Google sign-in failed. Please try again.")}
+        />
+      </div>
 
       <p className="text-sm text-neutral-600 text-center mt-4">
         Already have an account?{" "}

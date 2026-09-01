@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../hooks/useAuth';
 import AuthCard from '../../components/common/AuthCard';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [form, setForm] = useState({ email: '', password: '' });
@@ -24,6 +25,16 @@ export default function Login() {
       setError(err.response?.data?.message || 'Login failed. Check your details and try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError('');
+    try {
+      await loginWithGoogle(credentialResponse.credential);
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Google sign-in failed. Please try again.');
     }
   };
 
@@ -82,6 +93,19 @@ export default function Login() {
           </button>
         </div>
       </form>
+
+      <div className="flex items-center gap-2 mt-4">
+        <div className="flex-1 h-px bg-neutral-100" />
+        <span className="text-[10px] text-neutral-400 uppercase">or</span>
+        <div className="flex-1 h-px bg-neutral-100" />
+      </div>
+
+      <div className="flex justify-center mt-4">
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={() => setError('Google sign-in failed. Please try again.')}
+        />
+      </div>
 
       <p className="text-sm text-neutral-600 text-center mt-4">
         New here?{' '}

@@ -61,6 +61,12 @@ export default function ProductDetails() {
       .catch(() => setError("This product could not be found."))
       .finally(() => setLoading(false));
 
+    // Reset eligibility up front on every product change — otherwise a
+    // client-side navigation (no full remount) between products can briefly
+    // show the PREVIOUS product's eligibility while this one's fetch is
+    // still in flight.
+    setEligibility(null);
+
     if (user) {
       getWishlist()
         .then((res) =>
@@ -143,6 +149,20 @@ export default function ProductDetails() {
     product.options.length === 0 ||
     product.options.every((group) => selectedOptions[group.name]);
 
+  // A variant price applies only once every option group has a selection
+  // that exactly matches one of the vendor's stored combinations — partial
+  // selections never match, they just keep showing the base price.
+  const matchedVariantPrice =
+    allOptionsSelected && product.variantPrices?.length > 0
+      ? product.variantPrices.find((vp) => {
+          const keys = Object.keys(vp.combination);
+          return (
+            keys.length === Object.keys(selectedOptions).length &&
+            keys.every((k) => selectedOptions[k] === vp.combination[k])
+          );
+        })?.price
+      : undefined;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div className="aspect-square bg-neutral-50 rounded-lg overflow-hidden flex items-center justify-center relative">
@@ -187,7 +207,7 @@ export default function ProductDetails() {
         </p>
 
         <p className="font-heading text-3xl font-semibold text-primary-800 mb-4">
-          {formatNaira(product.price)}
+          {formatNaira(matchedVariantPrice ?? product.price)}
         </p>
 
         {offerContext && (
@@ -256,7 +276,9 @@ export default function ProductDetails() {
               ? "Adding..."
               : offerContext
                 ? `Add to cart at ${formatNaira(offerContext.proposedPrice)}`
-                : "Add to cart"}
+                : matchedVariantPrice != null
+                  ? `Add to cart at ${formatNaira(matchedVariantPrice)}`
+                  : "Add to cart"}
           </button>
 
           {product.offersEnabled && (

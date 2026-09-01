@@ -35,6 +35,7 @@ export default function ManageMyOrders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
+  const [deliveryCodeInputs, setDeliveryCodeInputs] = useState({});
 
   const loadOrders = () => {
     getVendorOrders()
@@ -49,10 +50,21 @@ export default function ManageMyOrders() {
     const nextStatus = NEXT_STATUS[order.status];
     if (!nextStatus) return;
 
+    let deliveryCode;
+    if (nextStatus === 'delivered') {
+      deliveryCode = (deliveryCodeInputs[order._id] || '').trim();
+      if (!deliveryCode) {
+        setError('Enter the delivery code the buyer gave you.');
+        return;
+      }
+    }
+
+    setError('');
     setUpdatingId(order._id);
     try {
-      const res = await updateOrderStatus(order._id, nextStatus);
+      const res = await updateOrderStatus(order._id, nextStatus, deliveryCode);
       setOrders(orders.map((o) => (o._id === order._id ? res.data : o)));
+      setDeliveryCodeInputs((prev) => ({ ...prev, [order._id]: '' }));
     } catch (err) {
       setError(err.response?.data?.message || 'Could not update order status.');
     } finally {
@@ -98,14 +110,35 @@ export default function ManageMyOrders() {
                 </Link>
               </div>
 
-              {NEXT_STATUS[order.status] && (
-                <button
-                  onClick={() => handleAdvance(order)}
-                  disabled={updatingId === order._id}
-                  className="h-8 px-4 rounded-lg bg-primary-900 text-white text-xs font-medium hover:bg-primary-800 disabled:opacity-60"
-                >
-                  Mark as {NEXT_STATUS[order.status]}
-                </button>
+              {NEXT_STATUS[order.status] === 'delivered' ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Delivery code from buyer"
+                    value={deliveryCodeInputs[order._id] || ''}
+                    onChange={(e) =>
+                      setDeliveryCodeInputs({ ...deliveryCodeInputs, [order._id]: e.target.value })
+                    }
+                    className="h-8 w-40 rounded-lg border border-neutral-200 px-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  />
+                  <button
+                    onClick={() => handleAdvance(order)}
+                    disabled={updatingId === order._id}
+                    className="h-8 px-4 rounded-lg bg-primary-900 text-white text-xs font-medium hover:bg-primary-800 disabled:opacity-60"
+                  >
+                    Confirm delivered
+                  </button>
+                </div>
+              ) : (
+                NEXT_STATUS[order.status] && (
+                  <button
+                    onClick={() => handleAdvance(order)}
+                    disabled={updatingId === order._id}
+                    className="h-8 px-4 rounded-lg bg-primary-900 text-white text-xs font-medium hover:bg-primary-800 disabled:opacity-60"
+                  >
+                    Mark as {NEXT_STATUS[order.status]}
+                  </button>
+                )
               )}
             </div>
           ))}

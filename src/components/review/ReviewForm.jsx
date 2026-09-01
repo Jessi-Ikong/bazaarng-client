@@ -27,12 +27,15 @@ export default function ReviewForm({ productId, onSubmitted }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-neutral-50 rounded-lg p-4 mb-4">
-      <p className="text-sm font-medium text-neutral-900 mb-2">
-        Write a review
+    <form
+      onSubmit={handleSubmit}
+      className="bg-primary-50 border-2 border-primary-100 rounded-xl p-6 mb-6"
+    >
+      <p className="font-heading text-lg font-semibold text-primary-900 mb-3">
+        ★ Write a review
       </p>
 
-      <div className="flex gap-1 mb-3">
+      <div className="flex gap-1.5 mb-4">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
@@ -40,13 +43,13 @@ export default function ReviewForm({ productId, onSubmitted }) {
             onClick={() => setRating(star)}
             onMouseEnter={() => setHoverRating(star)}
             onMouseLeave={() => setHoverRating(0)}
-            className="text-2xl leading-none"
+            className="text-4xl leading-none"
           >
             <span
               className={
                 star <= (hoverRating || rating)
                   ? "text-accent-600"
-                  : "text-neutral-200"
+                  : "text-neutral-300"
               }
             >
               ★
@@ -68,7 +71,7 @@ export default function ReviewForm({ productId, onSubmitted }) {
       <button
         type="submit"
         disabled={submitting}
-        className="h-9 px-4 rounded-lg bg-primary-900 text-white text-sm font-medium hover:bg-primary-800 disabled:opacity-60"
+        className="h-12 px-8 rounded-lg bg-primary-900 text-white text-base font-semibold hover:bg-primary-800 disabled:opacity-60"
       >
         {submitting ? "Submitting..." : "Submit review"}
       </button>
