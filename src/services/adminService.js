@@ -19,3 +19,9 @@ export const adminUpdateProductStatus = (productId, status) =>
 
 // Orders
 export const getAllOrdersAdmin = () => api.get('/orders/admin/all');
+
+// Promo slides
+export const getAllPromoSlidesAdmin = () => api.get('/promo-slides/admin/all');
+export const createPromoSlide = (data) => api.post('/promo-slides', data);
+export const updatePromoSlide = (id, data) => api.put(`/promo-slides/${id}`, data);
+export const deletePromoSlide = (id) => api.delete(`/promo-slides/${id}`);

@@ -41,6 +41,7 @@ import ManageVendors from "./pages/admin/ManageVendors";
 import ManageCategories from "./pages/admin/ManageCategories";
 import ManageAllProducts from "./pages/admin/ManageAllProducts";
 import ManageAllOrders from "./pages/admin/ManageAllOrders";
+import ManagePromoSlides from "./pages/admin/ManagePromoSlides";
 
 function App() {
   return (
@@ -230,6 +231,14 @@ function App() {
                   element={
                     <ProtectedRoute roles={["admin"]}>
                       <ManageAllOrders />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/promo-slides"
+                  element={
+                    <ProtectedRoute roles={["admin"]}>
+                      <ManagePromoSlides />
                     </ProtectedRoute>
                   }
                 />

@@ -334,6 +334,15 @@ export default function Navbar() {
               <span className={labelClass}>Support</span>
               <CountBadge count={unreadMessagesCount} />
             </Link>
+            <Link
+              to="/admin/promo-slides"
+              className={itemClass}
+              title="Promo slides"
+              onClick={() => setMenuOpen(false)}
+            >
+              <i className="ti ti-photo text-lg" />
+              <span className={labelClass}>Promo slides</span>
+            </Link>
           </>
         )}
         <Link
