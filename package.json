@@ -1,7 +1,7 @@
 {
-  "name": "kobobuy-client",
+  "name": "bazaarng-client",
   "version": "1.0.0",
-  "description": "Frontend for KoboBuy — multi-vendor marketplace with negotiable pricing",
+  "description": "Frontend for BazaarNG — multi-vendor marketplace with negotiable pricing",
   "type": "module",
   "scripts": {
     "dev": "vite",

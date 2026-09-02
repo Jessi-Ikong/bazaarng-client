@@ -6,7 +6,7 @@ export default function AuthCard({ title, subtitle, children }) {
       <div className="w-full max-w-sm bg-white rounded-xl border border-neutral-100 overflow-hidden">
         <div className="bg-primary-900 py-5 text-center">
           <p className="font-heading text-lg font-semibold text-white">
-            Kobo<span className="text-accent-200">Buy</span>
+            Bazaar<span className="text-accent-200">NG</span>
           </p>
         </div>
         <div className="p-6">

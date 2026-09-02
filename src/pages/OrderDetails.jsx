@@ -53,7 +53,7 @@ export default function OrderDetails() {
     setDownloading(true);
     try {
       const res = await downloadReceipt(id);
-      downloadBlob(res.data, `kobobuy-receipt-${id.slice(-8)}.pdf`);
+      downloadBlob(res.data, `bazaarng-receipt-${id.slice(-8)}.pdf`);
     } catch {
       alert("Could not download the receipt. Please try again.");
     } finally {

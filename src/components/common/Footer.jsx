@@ -38,7 +38,7 @@ export default function Footer() {
               Company
             </p>
             <ul className="space-y-1.5 text-sm text-primary-100">
-              <li><a href="mailto:support@kobobuy.com" className="hover:text-white">Contact us</a></li>
+              <li><a href="mailto:support@bazaarng.com" className="hover:text-white">Contact us</a></li>
               <li><Link to="/terms" className="hover:text-white">Terms of Service</Link></li>
               <li><Link to="/privacy" className="hover:text-white">Privacy Policy</Link></li>
             </ul>
@@ -57,7 +57,7 @@ export default function Footer() {
 
           <div>
             <p className="font-heading text-xs font-semibold text-accent-200 uppercase tracking-wide mb-2">
-              Sell on KoboBuy
+              Sell on BazaarNG
             </p>
             <ul className="space-y-1.5 text-sm text-primary-100">
               <li><Link to="/register-vendor" className="hover:text-white">Become a vendor</Link></li>
@@ -85,7 +85,7 @@ export default function Footer() {
             all share one row now instead of stacking as separate sections. */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-4 border-t border-primary-800 text-xs">
           <p className="font-heading font-semibold text-sm shrink-0">
-            Kobo<span className="text-accent-200">Buy</span>
+            Bazaar<span className="text-accent-200">NG</span>
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-primary-200">
@@ -100,7 +100,7 @@ export default function Footer() {
             <a href="#" aria-label="Facebook" className="hover:text-white"><i className="ti ti-brand-facebook" /></a>
           </div>
 
-          <p className="text-neutral-400 shrink-0">© {new Date().getFullYear()} KoboBuy</p>
+          <p className="text-neutral-400 shrink-0">© {new Date().getFullYear()} BazaarNG</p>
         </div>
       </div>
     </footer>

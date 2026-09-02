@@ -39,7 +39,7 @@ export default function Login() {
   };
 
   return (
-    <AuthCard title="Welcome back" subtitle="Log in to continue to KoboBuy.">
+    <AuthCard title="Welcome back" subtitle="Log in to continue to BazaarNG.">
       {location.state?.justReset && (
         <p className="text-sm text-primary-700 text-center mb-4">
           Password reset successfully — log in with your new password.

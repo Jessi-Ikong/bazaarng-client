@@ -43,7 +43,7 @@ export default function ProductCard({ product }) {
               {vendorInitial}
             </span>
             <span className="text-[11px] text-neutral-500 truncate">
-              {product.vendor?.storeName || 'KoboBuy vendor'}
+              {product.vendor?.storeName || 'BazaarNG vendor'}
             </span>
           </div>
 

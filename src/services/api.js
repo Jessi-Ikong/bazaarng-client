@@ -6,7 +6,7 @@ const api = axios.create({
 
 // Attach the JWT to every request, if we have one stored
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('kobobuy_token');
+  const token = localStorage.getItem('bazaarng_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

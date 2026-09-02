@@ -47,7 +47,7 @@ export default function ProductDetails() {
   const [offerContext, setOfferContext] = useState(null); // the accepted offer redirected here from MyOffers, if any
 
   useDocumentMeta(
-    product ? `${product.name} — KoboBuy` : "KoboBuy",
+    product ? `${product.name} — BazaarNG` : "BazaarNG",
     product
       ? `${product.name} — ${formatNaira(product.price)}. ${product.description?.slice(0, 140) || ""}`
       : undefined,

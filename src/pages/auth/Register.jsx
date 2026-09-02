@@ -55,7 +55,7 @@ export default function Register() {
   return (
     <AuthCard
       title="Create your account"
-      subtitle="Browse, buy, and negotiate on KoboBuy."
+      subtitle="Browse, buy, and negotiate on BazaarNG."
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {FIELDS.map((field) => (

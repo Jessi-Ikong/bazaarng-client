@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
 
   // On first load, check if we have a stored token and fetch the current user
   useEffect(() => {
-    const token = localStorage.getItem('kobobuy_token');
+    const token = localStorage.getItem('bazaarng_token');
     if (!token) {
       setLoading(false);
       return;
@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
     api
       .get('/auth/me')
       .then((res) => setUser(res.data))
-      .catch(() => localStorage.removeItem('kobobuy_token'))
+      .catch(() => localStorage.removeItem('bazaarng_token'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
   // normal login, both registration flows, and Google sign-in — so each
   // just needs to get that response and hand it here.
   const applyAuthResponse = (data) => {
-    localStorage.setItem('kobobuy_token', data.token);
+    localStorage.setItem('bazaarng_token', data.token);
     setUser(data);
     return data;
   };
@@ -43,20 +43,20 @@ export function AuthProvider({ children }) {
 
   const registerCustomer = async (formData) => {
     const res = await api.post('/auth/register', formData);
-    localStorage.setItem('kobobuy_token', res.data.token);
+    localStorage.setItem('bazaarng_token', res.data.token);
     setUser(res.data);
     return res.data;
   };
 
   const registerVendor = async (formData) => {
     const res = await api.post('/auth/register-vendor', formData);
-    localStorage.setItem('kobobuy_token', res.data.token);
+    localStorage.setItem('bazaarng_token', res.data.token);
     setUser(res.data);
     return res.data;
   };
 
   const logout = () => {
-    localStorage.removeItem('kobobuy_token');
+    localStorage.removeItem('bazaarng_token');
     setUser(null);
   };
 

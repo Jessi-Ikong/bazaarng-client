@@ -6,7 +6,7 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 export default function Home() {
   useDocumentMeta(
-    'KoboBuy — Buy, sell, and negotiate',
+    'BazaarNG — Buy, sell, and negotiate',
     'A marketplace built on trust. Browse products from verified vendors and negotiate prices directly — pay by card or on delivery.'
   );
 

@@ -25,7 +25,7 @@ export default function AdminDashboard() {
     <div>
       <div className="bg-primary-900 rounded-xl px-6 py-6 mb-6 text-white">
         <h1 className="font-heading text-xl font-semibold">Admin dashboard</h1>
-        <p className="text-primary-100 text-sm mt-1">Platform oversight for KoboBuy</p>
+        <p className="text-primary-100 text-sm mt-1">Platform oversight for BazaarNG</p>
       </div>
 
       {!loading && pendingCount > 0 && (

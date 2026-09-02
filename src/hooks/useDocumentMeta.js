@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 //
 // Honest limitation worth knowing: crawlers that DON'T execute JS —
 // most notably link-preview bots for WhatsApp, Facebook, and Twitter/X —
-// won't see these dynamic tags, so sharing a KoboBuy link there will show
+// won't see these dynamic tags, so sharing a BazaarNG link there will show
 // a generic preview rather than the actual product image/name. Fixing
 // that properly needs server-side rendering or prerendering, which is a
 // bigger architectural change than "SEO basics" — worth revisiting later

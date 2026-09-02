@@ -12,8 +12,8 @@ export default function CategoryPage() {
   const [error, setError] = useState('');
 
   useDocumentMeta(
-    categoryName ? `${categoryName} — KoboBuy` : 'KoboBuy',
-    categoryName ? `Shop ${categoryName} from verified vendors on KoboBuy.` : undefined
+    categoryName ? `${categoryName} — BazaarNG` : 'BazaarNG',
+    categoryName ? `Shop ${categoryName} from verified vendors on BazaarNG.` : undefined
   );
 
   useEffect(() => {

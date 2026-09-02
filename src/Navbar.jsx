@@ -100,7 +100,7 @@ export default function Navbar() {
         {/* Top row: logo, search (desktop only), hamburger (mobile only) */}
         <div className="flex items-center gap-6">
           <Link to="/" className="font-heading text-xl font-semibold tracking-tight shrink-0">
-            Kobo<span className="text-accent-200">Buy</span>
+            Bazaar<span className="text-accent-200">NG</span>
           </Link>
 
           <form onSubmit={handleSearchSubmit} className="hidden md:block flex-1 max-w-sm">

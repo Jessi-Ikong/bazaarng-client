@@ -15,8 +15,8 @@ export default function VendorStorePage() {
   const [error, setError] = useState('');
 
   useDocumentMeta(
-    store ? `${store.profile.storeName} — KoboBuy` : 'KoboBuy',
-    store ? `Shop ${store.profile.storeName} on KoboBuy — ${store.products.length} products available.` : undefined
+    store ? `${store.profile.storeName} — BazaarNG` : 'BazaarNG',
+    store ? `Shop ${store.profile.storeName} on BazaarNG — ${store.products.length} products available.` : undefined
   );
 
   useEffect(() => {

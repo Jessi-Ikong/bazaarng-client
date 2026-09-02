@@ -54,7 +54,7 @@ export default function RegisterVendor() {
 
   return (
     <AuthCard
-      title="Start selling on KoboBuy"
+      title="Start selling on BazaarNG"
       subtitle="Your store will be reviewed before it goes live."
     >
       <form onSubmit={handleSubmit} className="space-y-4">

@@ -180,7 +180,7 @@ export default function Checkout() {
           </div>
           {paymentMethod === 'pay_on_delivery' && (
             <p className="text-xs text-neutral-500 mt-2 text-center">
-              You'll pay securely through KoboBuy once your order is marked delivered — not cash in hand.
+              You'll pay securely through BazaarNG once your order is marked delivered — not cash in hand.
             </p>
           )}
         </div>

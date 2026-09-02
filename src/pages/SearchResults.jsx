@@ -8,7 +8,7 @@ export default function SearchResults() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
 
-  useDocumentMeta(query ? `"${query}" — Search results — KoboBuy` : 'Search — KoboBuy');
+  useDocumentMeta(query ? `"${query}" — Search results — BazaarNG` : 'Search — BazaarNG');
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
