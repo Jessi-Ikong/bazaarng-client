@@ -1,5 +1,25 @@
 import { Link } from "react-router-dom";
 
+// A slide's link may be a plain relative path (/products/abc123) or a full
+// URL — and a full URL might still point at this same site (e.g. an admin
+// pasted it straight from the address bar), which must still navigate
+// internally rather than opening a new tab. Only a genuinely different
+// hostname counts as external.
+function resolveLinkTarget(link) {
+  if (!/^https?:\/\//i.test(link)) {
+    return { isExternal: false, href: link };
+  }
+  try {
+    const url = new URL(link);
+    if (url.hostname === window.location.hostname) {
+      return { isExternal: false, href: `${url.pathname}${url.search}${url.hash}` };
+    }
+    return { isExternal: true, href: link };
+  } catch {
+    return { isExternal: true, href: link };
+  }
+}
+
 // Displays a single promo slide. Height is fixed (not derived from the
 // image's own dimensions or content) — below lg: picked to closely match
 // TrustBanner's actual rendered height (176px from sm: upward, ~150px on
@@ -10,7 +30,7 @@ import { Link } from "react-router-dom";
 // shift when switching with the banner at that size is expected/accepted.
 export default function PromoCarousel({ slide }) {
   const { image, title, link } = slide;
-  const isExternal = /^https?:\/\//i.test(link || "");
+  const { isExternal, href } = link ? resolveLinkTarget(link) : { isExternal: false, href: null };
 
   const content = (
     <div className="relative rounded-xl overflow-hidden mb-6 h-40 sm:h-44 lg:h-[352px] lg:max-w-xl lg:mx-auto bg-neutral-100">
@@ -33,14 +53,14 @@ export default function PromoCarousel({ slide }) {
 
   if (isExternal) {
     return (
-      <a href={link} target="_blank" rel="noopener noreferrer" className="block">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="block">
         {content}
       </a>
     );
   }
 
   return (
-    <Link to={link} className="block">
+    <Link to={href} className="block">
       {content}
     </Link>
   );

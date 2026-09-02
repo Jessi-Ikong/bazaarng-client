@@ -3,7 +3,7 @@ import { getActivePromoSlides } from "../../services/promoSlideService";
 import TrustBanner from "./TrustBanner";
 import PromoCarousel from "./PromoCarousel";
 
-const TURN_DURATION_MS = 30000;
+const TURN_DURATION_MS = 7000;
 
 // Alternates the homepage hero between the trust banner and the active
 // promo slides, one full 30s turn each: banner, slide 1, banner, slide 2,

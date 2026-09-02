@@ -18,6 +18,7 @@ export default function ManagePromoSlides() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
+  const [togglingId, setTogglingId] = useState(null);
 
   const loadSlides = () => {
     getAllPromoSlidesAdmin()
@@ -76,6 +77,19 @@ export default function ManagePromoSlides() {
       setError(err.response?.data?.message || 'Could not save promo slide.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleToggleActive = async (slide) => {
+    setError('');
+    setTogglingId(slide._id);
+    try {
+      const res = await updatePromoSlide(slide._id, { isActive: !slide.isActive });
+      setSlides((prev) => prev.map((s) => (s._id === slide._id ? res.data : s)));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not update promo slide.');
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -218,6 +232,13 @@ export default function ManagePromoSlides() {
                   className="h-8 px-3 rounded-lg border border-neutral-200 text-xs font-medium text-neutral-700 hover:bg-neutral-50"
                 >
                   Edit
+                </button>
+                <button
+                  onClick={() => handleToggleActive(slide)}
+                  disabled={togglingId === slide._id}
+                  className="h-8 px-3 rounded-lg border border-neutral-200 text-xs font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+                >
+                  {slide.isActive ? 'Disable' : 'Enable'}
                 </button>
                 <button
                   onClick={() => handleDelete(slide)}
