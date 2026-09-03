@@ -55,21 +55,13 @@ export default function MyOffers() {
     setActingId(offer._id);
     setError('');
     try {
+      // The backend always uses THIS offer's own selectedOptions (never
+      // whatever's sent here) — re-picking options would be pointless and
+      // could confusingly suggest a different variant is being chosen, so
+      // there's nothing to select here, just confirm and add.
       await addItemToCart(offer.product._id, 1, {}, offer._id);
       navigate('/cart');
     } catch (err) {
-      if (err.response?.data?.message?.includes('Please select')) {
-        // This product has variants (size/color/etc.) — those need to be
-        // chosen on the product page itself, not from a bare "add to cart"
-        // click here.
-        navigate(`/products/${offer.product._id}`, {
-          state: {
-            message: 'This product has options to choose before adding to cart.',
-            offerId: offer._id,
-          },
-        });
-        return;
-      }
       setError(err.response?.data?.message || 'Could not add to cart.');
       loadOffers(); // in case it just expired server-side
     } finally {
@@ -99,6 +91,14 @@ export default function MyOffers() {
                   {offer.status}
                 </span>
               </div>
+
+              {Object.keys(offer.selectedOptions || {}).length > 0 && (
+                <p className="text-xs text-neutral-500 mb-1">
+                  {Object.entries(offer.selectedOptions)
+                    .map(([name, value]) => `${name}: ${value}`)
+                    .join(', ')}
+                </p>
+              )}
 
               <p className="text-sm text-neutral-700 mb-3">
                 Listed at <span className="font-medium">{formatNaira(offer.product?.price)}</span> ·

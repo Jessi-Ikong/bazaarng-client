@@ -76,6 +76,13 @@ export default function ManageMyOffers() {
                 </span>
               </div>
               <p className="text-xs text-neutral-500 mb-2">From {offer.buyer?.name}</p>
+              {Object.keys(offer.selectedOptions || {}).length > 0 && (
+                <p className="text-xs text-neutral-500 mb-2">
+                  {Object.entries(offer.selectedOptions)
+                    .map(([name, value]) => `${name}: ${value}`)
+                    .join(', ')}
+                </p>
+              )}
               <p className="text-sm text-neutral-700 mb-3">
                 Listed at <span className="font-medium">{formatNaira(offer.product?.price)}</span> ·
                 Offered <span className="font-medium text-primary-700">{formatNaira(offer.proposedPrice)}</span>
