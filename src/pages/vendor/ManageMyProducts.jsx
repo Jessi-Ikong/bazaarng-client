@@ -459,6 +459,47 @@ export default function ManageMyProducts() {
                 ))}
               </div>
 
+              {liveCombinations.length > 0 && (
+                <div>
+                  <p className="text-xs text-neutral-600 mb-1.5">
+                    Variant prices{" "}
+                    <span className="text-neutral-400">
+                      (optional — blank uses the base price)
+                    </span>
+                  </p>
+                  <div className="space-y-1.5">
+                    {liveCombinations.map((combo) => {
+                      const key = comboKey(combo);
+                      return (
+                        <div key={key} className="flex items-center gap-2">
+                          <span className="text-xs text-neutral-600 flex-1 truncate">
+                            {Object.entries(combo)
+                              .map(([k, v]) => `${k}: ${v}`)
+                              .join(", ")}
+                          </span>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="Base price"
+                            value={form.variantPrices[key] || ""}
+                            onChange={(e) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                variantPrices: {
+                                  ...prev.variantPrices,
+                                  [key]: e.target.value,
+                                },
+                              }))
+                            }
+                            className="w-28 h-8 rounded-lg border border-neutral-100 px-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary-400"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <label className="flex items-center gap-2 text-sm text-neutral-700">
                 <input
                   type="checkbox"
