@@ -61,6 +61,21 @@ function OrderCard({ order, onPayNow, onRetry, acting }) {
             {order.paymentMethod === 'card' ? 'Card' : 'Pay on delivery'}
           </p>
           {optionsSummary && <p className="text-xs text-neutral-500 mt-0.5">{optionsSummary}</p>}
+          {order.status === 'delivered' && order.paymentStatus === 'paid' && (
+            <div className="mt-2 space-y-1">
+              {order.items.map((item, index) => (
+                item.product?._id ? (
+                  <Link
+                    key={item.product._id || index}
+                    to={`/products/${item.product._id}`}
+                    className="block text-xs text-primary-600 hover:underline"
+                  >
+                    Write a review for {item.name}
+                  </Link>
+                ) : null
+              ))}
+            </div>
+          )}
         </div>
         <span
           className={`text-xs font-medium px-2 py-0.5 rounded-md h-fit ${
