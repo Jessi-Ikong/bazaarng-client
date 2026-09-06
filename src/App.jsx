@@ -34,6 +34,7 @@ import ManageMyProducts from "./pages/vendor/ManageMyProducts";
 import ManageMyOrders from "./pages/vendor/ManageMyOrders";
 import ManageMyOffers from "./pages/vendor/ManageMyOffers";
 import VendorEarnings from "./pages/vendor/VendorEarnings";
+import VendorAnalytics from "./pages/vendor/VendorAnalytics";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminMessages from "./pages/admin/AdminMessages";
@@ -42,6 +43,7 @@ import ManageCategories from "./pages/admin/ManageCategories";
 import ManageAllProducts from "./pages/admin/ManageAllProducts";
 import ManageAllOrders from "./pages/admin/ManageAllOrders";
 import ManagePromoSlides from "./pages/admin/ManagePromoSlides";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
 
 function App() {
   return (
@@ -184,6 +186,14 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/vendor/analytics"
+                  element={
+                    <ProtectedRoute roles={["vendor"]}>
+                      <VendorAnalytics />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Admin only */}
                 <Route
@@ -239,6 +249,14 @@ function App() {
                   element={
                     <ProtectedRoute roles={["admin"]}>
                       <ManagePromoSlides />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/analytics"
+                  element={
+                    <ProtectedRoute roles={["admin"]}>
+                      <AdminAnalytics />
                     </ProtectedRoute>
                   }
                 />

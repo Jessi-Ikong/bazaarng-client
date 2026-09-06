@@ -302,6 +302,15 @@ export default function Navbar() {
               <CountBadge count={offersCount} />
             </Link>
             <Link
+              to="/vendor/analytics"
+              className={itemClass}
+              title="Analytics"
+              onClick={() => setMenuOpen(false)}
+            >
+              <i className="ti ti-chart-line text-lg" />
+              <span className={labelClass}>Analytics</span>
+            </Link>
+            <Link
               to="/messages"
               className={itemClass}
               title="Messages"
@@ -342,6 +351,15 @@ export default function Navbar() {
             >
               <i className="ti ti-photo text-lg" />
               <span className={labelClass}>Promo slides</span>
+            </Link>
+            <Link
+              to="/admin/analytics"
+              className={itemClass}
+              title="Analytics"
+              onClick={() => setMenuOpen(false)}
+            >
+              <i className="ti ti-chart-line text-lg" />
+              <span className={labelClass}>Analytics</span>
             </Link>
           </>
         )}
