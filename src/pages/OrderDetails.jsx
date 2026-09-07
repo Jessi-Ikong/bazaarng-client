@@ -209,11 +209,19 @@ export default function OrderDetails() {
             );
           })}
         </div>
-        <div className="flex justify-between pt-3 mt-3 border-t border-neutral-100">
-          <p className="text-sm font-medium text-neutral-900">Total</p>
-          <p className="font-heading font-semibold text-primary-800">
-            {formatNaira(order.totalAmount)}
-          </p>
+        <div className="pt-3 mt-3 border-t border-neutral-100 space-y-2">
+          <div className="flex justify-between">
+            <p className="text-sm text-neutral-600">Delivery fee</p>
+            <p className="text-sm text-neutral-900">
+              {formatNaira(order.deliveryFee || 0)}
+            </p>
+          </div>
+          <div className="flex justify-between">
+            <p className="text-sm font-medium text-neutral-900">Total</p>
+            <p className="font-heading font-semibold text-primary-800">
+              {formatNaira(order.totalAmount)}
+            </p>
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCart } from '../services/cartService';
+import { getCart, getDeliveryFeePreview } from '../services/cartService';
 import { checkout } from '../services/orderService';
 import { getMe } from '../services/userService';
 import { useCart } from '../hooks/useCart';
@@ -22,6 +22,7 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [deliveryFees, setDeliveryFees] = useState([]);
   const { refreshCart } = useCart();
 
   useEffect(() => {
@@ -46,6 +47,23 @@ export default function Checkout() {
       })
       .catch(() => {}); // non-critical — checkout still works with a blank form
   }, []);
+
+  // Recomputes the per-vendor delivery fee preview whenever the buyer's
+  // city/state changes, using the same helper checkout itself uses — so
+  // this preview can never drift from what's actually charged. Debounced
+  // so it doesn't fire on every keystroke.
+  useEffect(() => {
+    if (!form.city && !form.state) {
+      setDeliveryFees([]);
+      return;
+    }
+    const timeout = setTimeout(() => {
+      getDeliveryFeePreview(form.city, form.state)
+        .then((res) => setDeliveryFees(res.data))
+        .catch(() => setDeliveryFees([]));
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [form.city, form.state]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -80,7 +98,9 @@ export default function Checkout() {
   if (loading) return <Loader />;
 
   const items = cart?.items || [];
-  const total = items.reduce((sum, item) => sum + item.priceAtAdd * item.quantity, 0);
+  const subtotal = items.reduce((sum, item) => sum + item.priceAtAdd * item.quantity, 0);
+  const deliveryTotal = deliveryFees.reduce((sum, v) => sum + v.deliveryFee, 0);
+  const total = subtotal + deliveryTotal;
 
   if (items.length === 0) {
     return (
@@ -96,8 +116,29 @@ export default function Checkout() {
         Checkout
       </h1>
       <p className="text-sm text-neutral-500 mb-6 text-center">
-        {formatNaira(total)} · {items.length} item{items.length > 1 ? 's' : ''}
+        {items.length} item{items.length > 1 ? 's' : ''}
       </p>
+
+      <div className="bg-white border border-neutral-100 rounded-lg p-5 mb-4">
+        <h2 className="font-heading text-sm font-semibold text-neutral-900 mb-3">Order summary</h2>
+        <div className="flex justify-between text-sm text-neutral-600 mb-2">
+          <span>Subtotal</span>
+          <span>{formatNaira(subtotal)}</span>
+        </div>
+        {deliveryFees.map((v) => (
+          <div key={v.vendorId} className="flex justify-between text-sm text-neutral-600 mb-2">
+            <span>Delivery — {v.storeName}</span>
+            <span>{formatNaira(v.deliveryFee)}</span>
+          </div>
+        ))}
+        {!form.city && !form.state && (
+          <p className="text-xs text-neutral-500 mb-2">Enter your city and state below to see delivery fees.</p>
+        )}
+        <div className="flex justify-between text-sm font-semibold text-neutral-900 pt-2 border-t border-neutral-100">
+          <span>Total</span>
+          <span>{formatNaira(total)}</span>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="bg-white border border-neutral-100 rounded-lg p-6 space-y-4">
         <div>

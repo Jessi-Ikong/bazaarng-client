@@ -27,7 +27,15 @@ export default function Profile() {
     state: '',
     country: '',
   });
-  const [storeForm, setStoreForm] = useState({ storeName: '', storeDescription: '' });
+  const [storeForm, setStoreForm] = useState({
+    storeName: '',
+    storeDescription: '',
+    city: '',
+    state: '',
+    deliveryFeeSameCity: 0,
+    deliveryFeeSameState: 0,
+    deliveryFeeDifferentState: 0,
+  });
 
   useEffect(() => {
     getMe()
@@ -53,6 +61,11 @@ export default function Profile() {
           setStoreForm({
             storeName: res.data.storeName || '',
             storeDescription: res.data.storeDescription || '',
+            city: res.data.city || '',
+            state: res.data.state || '',
+            deliveryFeeSameCity: res.data.deliveryFeeSameCity ?? 0,
+            deliveryFeeSameState: res.data.deliveryFeeSameState ?? 0,
+            deliveryFeeDifferentState: res.data.deliveryFeeDifferentState ?? 0,
           });
         })
         .catch(() => {});
@@ -60,7 +73,10 @@ export default function Profile() {
   }, [authUser?.role]);
 
   const handleAccountChange = (e) => setAccountForm({ ...accountForm, [e.target.name]: e.target.value });
-  const handleStoreChange = (e) => setStoreForm({ ...storeForm, [e.target.name]: e.target.value });
+  const handleStoreChange = (e) => {
+    const { name, value, type } = e.target;
+    setStoreForm({ ...storeForm, [name]: type === 'number' ? Number(value) : value });
+  };
 
   const handleSaveAccount = async (e) => {
     e.preventDefault();
@@ -210,6 +226,61 @@ export default function Profile() {
               onChange={handleStoreChange}
               className="w-full rounded-lg border border-neutral-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
+          </div>
+
+          <p className="text-xs text-neutral-600 pt-2">Store location (used to calculate delivery fees)</p>
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              name="city"
+              placeholder="City"
+              value={storeForm.city}
+              onChange={handleStoreChange}
+              className="w-full h-10 rounded-lg border border-neutral-100 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+            />
+            <input
+              name="state"
+              placeholder="State"
+              value={storeForm.state}
+              onChange={handleStoreChange}
+              className="w-full h-10 rounded-lg border border-neutral-100 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+            />
+          </div>
+
+          <p className="text-xs text-neutral-600 pt-2">Delivery fees (₦) — leave at 0 for free delivery</p>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs text-neutral-500 mb-1">Same city</label>
+              <input
+                type="number"
+                min="0"
+                name="deliveryFeeSameCity"
+                value={storeForm.deliveryFeeSameCity}
+                onChange={handleStoreChange}
+                className="w-full h-10 rounded-lg border border-neutral-100 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-neutral-500 mb-1">Same state</label>
+              <input
+                type="number"
+                min="0"
+                name="deliveryFeeSameState"
+                value={storeForm.deliveryFeeSameState}
+                onChange={handleStoreChange}
+                className="w-full h-10 rounded-lg border border-neutral-100 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-neutral-500 mb-1">Different state</label>
+              <input
+                type="number"
+                min="0"
+                name="deliveryFeeDifferentState"
+                value={storeForm.deliveryFeeDifferentState}
+                onChange={handleStoreChange}
+                className="w-full h-10 rounded-lg border border-neutral-100 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end pt-1">

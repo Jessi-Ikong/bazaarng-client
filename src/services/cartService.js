@@ -7,3 +7,5 @@ export const addItemToCart = (productId, quantity = 1, selectedOptions = {}, off
 // appear as more than one line now (different variant selections).
 export const updateCartItem = (itemId, quantity) => api.put(`/cart/items/${itemId}`, { quantity });
 export const removeCartItem = (itemId) => api.delete(`/cart/items/${itemId}`);
+export const getDeliveryFeePreview = (city, state) =>
+  api.get('/cart/delivery-preview', { params: { city, state } });
